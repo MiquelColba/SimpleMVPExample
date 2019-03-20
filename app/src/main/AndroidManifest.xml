@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.simplemvpexample.app">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,9 +12,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".screens.NoteDetailScreen"
-            android:parentActivityName=".screens.ListOfNotesScreen"></activity>
-        <activity android:name=".screens.ListOfNotesScreen">
+        <activity android:name=".screens.NewCharacter"
+            android:label="@string/character"
+            android:parentActivityName=".screens.ListOfCharacters"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".screens.CharacterDetails"
+            android:label="@string/character"
+            android:parentActivityName=".screens.ListOfCharacters"
+            android:screenOrientation="portrait" />
+        <activity android:name=".screens.ListOfCharacters"
+            android:label="@string/list_of_characters"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
