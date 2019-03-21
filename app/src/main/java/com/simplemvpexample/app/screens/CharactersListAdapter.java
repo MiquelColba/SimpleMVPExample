@@ -55,6 +55,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
             Glide.with( parentActivity )
                     .load( imageUri )
                     .into( viewHolder.picture);
+
         } else {
 
             Glide.with( parentActivity )
