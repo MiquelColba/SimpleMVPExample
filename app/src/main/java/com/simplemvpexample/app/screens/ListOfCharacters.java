@@ -22,6 +22,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     private CharactersDB charactersDB;
     private RecyclerView charactersList;
     private CharactersListAdapter adapter;
+    private LinearLayoutManager layoutManager;
 
     private static String TAG = "EvilCharacters";
 
@@ -43,23 +44,23 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
         charactersDB = new CharactersDB( this );
 
         charactersList = findViewById( R.id.rvList );
+        charactersList.setHasFixedSize( true );
         adapter = new CharactersListAdapter( this );
         setUpRecyclerView();
+
     }
 
     private void setUpRecyclerView() {
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager( this );
-        layoutManager.setOrientation( LinearLayoutManager.VERTICAL );
+        layoutManager = new LinearLayoutManager( this );
         charactersList.setLayoutManager( layoutManager );
 
         charactersList.setAdapter( adapter );
+
     }
 
     @Override
     public void onCharactersAvailable(List<EvilCharacter> characters) {
-
-        Log.d( TAG, "characters available:: " + characters );
 
         if (characters != null) {
             if (adapter != null) {
@@ -72,7 +73,13 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     protected void onResume() {
 
         charactersDB.getAllCharacters(this);
-        Log.d(TAG, "getAllCharacters called");
+
         super.onResume();
+    }
+
+    public void viewCharactersDetails(EvilCharacter character) {
+        Intent detailsIntent = new Intent( this, CharacterDetails.class );
+        detailsIntent.putExtra( "character", character );
+        startActivity( detailsIntent );
     }
 }

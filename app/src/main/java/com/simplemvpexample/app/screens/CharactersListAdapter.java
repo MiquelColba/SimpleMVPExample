@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +17,14 @@ import com.simplemvpexample.app.data.model.EvilCharacter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> {
+public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> implements ItemClickListener {
 
     private List<EvilCharacter> characters;
-    private Activity parentActivity;
+    private ListOfCharacters parentActivity;
 
     private static String TAG = "EvilCharacters";
 
-    public CharactersListAdapter(Activity parentActivity) {
+    public CharactersListAdapter(ListOfCharacters parentActivity) {
         characters = new ArrayList<>();
         this.parentActivity = parentActivity;
     }
@@ -36,10 +35,10 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
 
         View cell = LayoutInflater.from( viewGroup.getContext() ).inflate( R.layout.list_cell, viewGroup, false);
 
-        return new CharacterViewHolder( cell );
+        CharacterViewHolder vh = new CharacterViewHolder( cell, this );
+
+        return vh;
     }
-
-
 
     @Override
     public void onBindViewHolder(@NonNull CharacterViewHolder viewHolder, int position) {
@@ -50,23 +49,26 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         viewHolder.movie.setText( eC.getMovie() );
 
         if (eC.getImage() != null && !eC.getImage().equalsIgnoreCase( "" )) {
+
             Uri imageUri = Uri.parse( eC.getImage() );
 
             Glide.with( parentActivity )
                     .load( imageUri )
+                    .circleCrop()
                     .into( viewHolder.picture);
 
         } else {
 
             Glide.with( parentActivity )
                     .load( parentActivity.getDrawable( R.drawable.no_picture ) )
+                    .circleCrop()
                     .into( viewHolder.picture);
+
         }
     }
 
     @Override
     public int getItemCount() {
-        Log.d( TAG, "ADAPTER - getItemCount(): " + characters.size() );
         return characters.size();
     }
 
@@ -81,19 +83,34 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         notifyDataSetChanged();
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+        parentActivity.viewCharactersDetails( characters.get( position ) );
+    }
 
-    public static class CharacterViewHolder extends RecyclerView.ViewHolder {
+    public static class CharacterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView name;
         TextView movie;
         ImageView picture;
+        ItemClickListener listener;
 
-        public CharacterViewHolder(@NonNull View view) {
+        public CharacterViewHolder(@NonNull View view, ItemClickListener clickListener) {
+
             super(view);
 
             name = view.findViewById( R.id.tvCellName );
             movie = view.findViewById( R.id.tvCellMovie );
             picture = view.findViewById( R.id.ivCellPicture );
+
+            listener = clickListener;
+
+            view.setOnClickListener( this );
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onItemClick( v, getAdapterPosition() );
         }
     }
 
