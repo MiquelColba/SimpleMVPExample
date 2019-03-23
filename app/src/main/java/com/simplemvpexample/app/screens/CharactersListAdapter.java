@@ -54,6 +54,11 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
 
             Glide.with( parentActivity )
                     .load( imageUri )
+                    .error(
+                            Glide.with( parentActivity)
+                                    .load( parentActivity.getDrawable( R.drawable.no_picture ) )
+                                    .circleCrop()
+                    )
                     .circleCrop()
                     .into( viewHolder.picture);
 
@@ -84,6 +89,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
     }
 
     public void deleteCharacter(int characterId) {
+
         if (characters != null && !characters.isEmpty()) {
 
             int idx = -1;
@@ -98,6 +104,11 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
 
             if (idx != -1) {
                 characters.remove( idx );
+
+                if (characters.isEmpty()) {
+                    parentActivity.noCharactersAvailable();
+                }
+
                 notifyItemRemoved( idx );
             }
         }
