@@ -49,7 +49,7 @@ public class EvilCharacter implements Parcelable {
         if (image != null) {
             dest.writeString( image );
         } else {
-            dest.writeString( "" );
+            dest.writeString( null );
         }
     }
 

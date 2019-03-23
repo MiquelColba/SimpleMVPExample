@@ -52,7 +52,7 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
         super.onCreate( savedInstanceState );
         setContentView( R.layout.new_character );
 
-        charactersDB = new CharactersDB( this );
+        charactersDB = CharactersDB.getInstance( this );
 
         picture = findViewById( R.id.ivNewPicture );
 

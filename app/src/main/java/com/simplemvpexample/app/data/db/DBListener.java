@@ -10,5 +10,7 @@ public interface DBListener {
 
     void onCharacterDeleted(int characterID);
 
-    void onCharacterUpdated(int characterID);
+    void onCharacterUpdated(EvilCharacter character);
+
+    void onCharacterInserted(EvilCharacter character);
 }

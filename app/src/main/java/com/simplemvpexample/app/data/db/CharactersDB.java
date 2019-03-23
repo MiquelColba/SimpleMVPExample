@@ -12,15 +12,28 @@ public class CharactersDB {
     private EvilCharacterDAO characterDAO;
     private DBListener dbListener;
 
+    private static volatile CharactersDB charactersDB;
 
-    public CharactersDB(Context context) {
-        AppRoomDatabase db = AppRoomDatabase.getDatabase( context );
 
-        characterDAO = db.characterDAO();
+    public static CharactersDB getInstance(final Context context) {
+
+        if (charactersDB == null) {
+            charactersDB = new CharactersDB(context);
+        }
+
+        return charactersDB;
+    }
+
+    private CharactersDB(Context context) {
+
+            AppRoomDatabase db = AppRoomDatabase.getDatabase( context );
+
+            characterDAO = db.characterDAO();
+
     }
 
     public void insertCharacter(EvilCharacter character) {
-       new insertAsyncTask( characterDAO ).execute( character );
+       new insertAsyncTask( characterDAO , dbListener).execute( character );
     }
 
     public void deleteCharacter(EvilCharacter character) {
@@ -43,18 +56,37 @@ public class CharactersDB {
         dbListener = null;
     }
 
-    private static class insertAsyncTask extends AsyncTask<EvilCharacter, Void, Void> {
+    private static class insertAsyncTask extends AsyncTask<EvilCharacter, Void, EvilCharacter> {
 
         private EvilCharacterDAO mAsyncTaskDao;
+        private DBListener dbListener;
 
-        insertAsyncTask(EvilCharacterDAO dao) {
+        insertAsyncTask(EvilCharacterDAO dao, DBListener listener) {
+
             mAsyncTaskDao = dao;
+            dbListener = listener;
         }
 
         @Override
-        protected Void doInBackground(final EvilCharacter... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
+        protected EvilCharacter doInBackground(final EvilCharacter... params) {
+
+            EvilCharacter character = params[0];
+
+            long id = mAsyncTaskDao.insert(character);
+
+            character.setId( (int) id );
+
+            return character;
+        }
+
+        @Override
+        protected void onPostExecute(EvilCharacter character) {
+
+            if (dbListener != null) {
+                dbListener.onCharacterInserted( character );
+            }
+
+            super.onPostExecute( character );
         }
     }
 
@@ -71,18 +103,28 @@ public class CharactersDB {
 
         @Override
         protected Integer doInBackground(final EvilCharacter... params) {
-            int rowsDeleted = mAsyncTaskDao.delete(params[0]);
-            return rowsDeleted;
+
+            EvilCharacter character = params[0];
+
+            int rowsDeleted = mAsyncTaskDao.delete(character);
+
+            if (rowsDeleted == 1) {
+                return character.getId();
+            }
+
+            return -1;
         }
 
         @Override
-        protected void onPostExecute(Integer rowsDeleted) {
-            dbListener.onCharacterDeleted( rowsDeleted );
-            super.onPostExecute( rowsDeleted );
+        protected void onPostExecute(Integer characterID) {
+            if (dbListener != null) {
+                dbListener.onCharacterDeleted( characterID );
+            }
+            super.onPostExecute( characterID );
         }
     }
 
-    private static class updateAsyncTask extends AsyncTask<EvilCharacter, Void, Integer> {
+    private static class updateAsyncTask extends AsyncTask<EvilCharacter, Void, EvilCharacter> {
 
         private EvilCharacterDAO mAsyncTaskDao;
         private DBListener dbListener;
@@ -93,15 +135,25 @@ public class CharactersDB {
         }
 
         @Override
-        protected Integer doInBackground(final EvilCharacter... params) {
-            mAsyncTaskDao.update(params[0]);
+        protected EvilCharacter doInBackground(final EvilCharacter... params) {
+
+            EvilCharacter character = params[0];
+            int rowsUpdated = mAsyncTaskDao.update(character);
+
+            if (rowsUpdated == 1) {
+                return character;
+            }
+
             return null;
         }
 
         @Override
-        protected void onPostExecute(Integer rowsUpdated) {
-            dbListener.onCharacterUpdated( rowsUpdated );
-            super.onPostExecute( rowsUpdated );
+        protected void onPostExecute(EvilCharacter chracter) {
+
+            if (dbListener != null) {
+                dbListener.onCharacterUpdated( chracter );
+            }
+            super.onPostExecute( chracter );
         }
     }
 
@@ -117,7 +169,11 @@ public class CharactersDB {
 
         @Override
         protected void onPostExecute(List<EvilCharacter> evilCharacters) {
-            dbListener.onCharactersAvailable( evilCharacters );
+            if (dbListener != null) {
+
+                dbListener.onCharactersAvailable( evilCharacters );
+            }
+
             super.onPostExecute( evilCharacters );
         }
 

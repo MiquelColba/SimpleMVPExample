@@ -83,6 +83,60 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         notifyDataSetChanged();
     }
 
+    public void deleteCharacter(int characterId) {
+        if (characters != null && !characters.isEmpty()) {
+
+            int idx = -1;
+
+            for (int i = 0; i < characters.size(); i++) {
+
+                if (characters.get( i ).getId() == characterId) {
+                    idx = i;
+                    break;
+                }
+            }
+
+            if (idx != -1) {
+                characters.remove( idx );
+                notifyItemRemoved( idx );
+            }
+        }
+    }
+
+    public void updateCharacter(EvilCharacter character) {
+
+        if (characters != null && !characters.isEmpty()) {
+
+            int characterId = character.getId();
+
+            int idx = -1;
+
+            for (int i = 0; i < characters.size(); i++) {
+
+                if (characters.get( i ).getId() == characterId) {
+                    idx = i;
+                    break;
+                }
+            }
+
+            if (idx != -1) {
+                characters.set( idx, character );
+                notifyItemChanged( idx );
+            }
+        }
+    }
+
+    public void insertCharacter(EvilCharacter character) {
+
+        if (characters == null) {
+            characters = new ArrayList<>(  );
+        }
+
+        if (characters.add( character )) {
+            notifyItemInserted( characters.size() - 1 );
+        }
+    }
+
     @Override
     public void onItemClick(View view, int position) {
         parentActivity.viewCharactersDetails( characters.get( position ) );

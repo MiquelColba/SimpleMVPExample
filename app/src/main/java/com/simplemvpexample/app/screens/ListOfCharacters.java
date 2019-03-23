@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.simplemvpexample.app.R;
@@ -41,7 +40,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
             }
         } );
 
-        charactersDB = new CharactersDB( this );
+        charactersDB = CharactersDB.getInstance( this );
         charactersDB.registerListener( this );
 
         charactersList = findViewById( R.id.rvList );
@@ -49,6 +48,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
         adapter = new CharactersListAdapter( this );
         setUpRecyclerView();
 
+        charactersDB.getAllCharacters();
     }
 
     private void setUpRecyclerView() {
@@ -71,21 +71,24 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
+    public void onCharacterInserted(EvilCharacter character) {
+        if (character != null && adapter != null) {
+            adapter.insertCharacter( character );
+        }
+    }
+
+    @Override
     public void onCharacterDeleted(int characterID) {
-
+        if (characterID != -1 && adapter != null) {
+            adapter.deleteCharacter( characterID );
+        }
     }
 
     @Override
-    public void onCharacterUpdated(int characterID) {
-
-    }
-
-    @Override
-    protected void onResume() {
-
-        charactersDB.getAllCharacters();
-
-        super.onResume();
+    public void onCharacterUpdated(EvilCharacter character) {
+        if (character != null && adapter != null) {
+            adapter.updateCharacter( character );
+        }
     }
 
     public void viewCharactersDetails(EvilCharacter character) {

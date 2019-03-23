@@ -16,11 +16,6 @@
             android:label="@string/character"
             android:parentActivityName=".screens.ListOfCharacters"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".screens.CharacterDetails"
-            android:label="@string/character"
-            android:parentActivityName=".screens.ListOfCharacters"
-            android:screenOrientation="portrait" />
         <activity android:name=".screens.ListOfCharacters"
             android:label="@string/list_of_characters"
             android:screenOrientation="portrait">

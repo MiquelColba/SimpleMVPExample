@@ -14,7 +14,7 @@ import java.util.List;
 public interface EvilCharacterDAO {
 
     @Insert
-    void insert(EvilCharacter character);
+    long insert(EvilCharacter character);
 
     @Delete
     int delete(EvilCharacter character);
