@@ -42,6 +42,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
         } );
 
         charactersDB = new CharactersDB( this );
+        charactersDB.registerListener( this );
 
         charactersList = findViewById( R.id.rvList );
         charactersList.setHasFixedSize( true );
@@ -70,16 +71,40 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
+    public void onCharacterDeleted(int characterID) {
+
+    }
+
+    @Override
+    public void onCharacterUpdated(int characterID) {
+
+    }
+
+    @Override
     protected void onResume() {
 
-        charactersDB.getAllCharacters(this);
+        charactersDB.getAllCharacters();
 
         super.onResume();
     }
 
     public void viewCharactersDetails(EvilCharacter character) {
-        Intent detailsIntent = new Intent( this, CharacterDetails.class );
+        Intent detailsIntent = new Intent( this, NewCharacter.class );
         detailsIntent.putExtra( "character", character );
         startActivity( detailsIntent );
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (charactersDB != null) {
+            charactersDB.unregisterListener();
+        }
+
+        if (charactersList != null && charactersList.getAdapter() != null) {
+            adapter = null;
+            charactersList.setAdapter( null );
+        }
+
+        super.onDestroy();
     }
 }

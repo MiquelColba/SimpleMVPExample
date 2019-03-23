@@ -4,6 +4,7 @@
     <string name="list_of_characters">Evil characters</string>
     <string name="text_movie">Movie:</string>
     <string name="text_name">Name:</string>
+    <string name="text_appears_in">Appears in:</string>
     <string name="name_hint">Set a name</string>
     <string name="movie_hint">Set a movie</string>
 
@@ -11,5 +12,6 @@
     <string name="default_no_movie">No movie set</string>
 
     <string name="menu_save">Save</string>
+    <string name="menu_delete">Delete</string>
 
 </resources>

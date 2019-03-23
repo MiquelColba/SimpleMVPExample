@@ -7,4 +7,8 @@ import java.util.List;
 public interface DBListener {
 
     void onCharactersAvailable(List<EvilCharacter> characters);
+
+    void onCharacterDeleted(int characterID);
+
+    void onCharacterUpdated(int characterID);
 }

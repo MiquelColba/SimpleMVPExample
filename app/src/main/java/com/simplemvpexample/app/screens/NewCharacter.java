@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -28,8 +27,6 @@ import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.db.CharactersDB;
 import com.simplemvpexample.app.data.model.EvilCharacter;
 
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.util.List;
 
@@ -45,6 +42,8 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     private EvilCharacter character;
     private CharactersDB charactersDB;
 
+    private boolean isEdit = false;
+
     private static final int CAMERA_PERMISSION_CHECK = 44;
     private static final int STORAGE_PERMISSION_CHECK = 55;
 
@@ -52,6 +51,8 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.new_character );
+
+        charactersDB = new CharactersDB( this );
 
         picture = findViewById( R.id.ivNewPicture );
 
@@ -72,9 +73,27 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
             }
         } );
 
-        character = new EvilCharacter();
-        charactersDB = new CharactersDB( this );
-        setImagePicture( null );
+        if (getIntent().hasExtra( "character" )) {
+            // Visualize character information
+            character = getIntent().getParcelableExtra( "character" );
+
+            if (character != null) {
+
+                isEdit = true;
+
+                name.setText( character.getName() );
+                movie.setText( character.getMovie() );
+
+                Uri imageUri = character.getImage() != null ? Uri.parse( character.getImage() ) : null;
+
+                setImagePicture( imageUri );
+            }
+
+        } else {
+            character = new EvilCharacter();
+            setImagePicture( null );
+        }
+
     }
 
     @Override
@@ -170,7 +189,13 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate( R.menu.add_edit_menu, menu );
+
+        if (isEdit) {
+            inflater.inflate( R.menu.save_delete_menu, menu );
+        } else {
+            inflater.inflate( R.menu.save_menu, menu );
+        }
+
         return true;
     }
 
@@ -181,12 +206,25 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
             case R.id.save:
                 // Check that character has at least a name and a movie
                 if (validateCharacter()) {
-                    // Save in DB and go back
-                    charactersDB.insertCharacter( character );
+
+                    if (!isEdit) {
+                        // Save in DB and go back
+                        charactersDB.insertCharacter( character );
+                    } else {
+                        // Update element in DB
+                        charactersDB.updateCharacter( character );
+                    }
+
                     finish();
                 }
 
                 return true;
+
+            case R.id.delete:
+                charactersDB.deleteCharacter( character );
+                finish();
+                return true;
+
             default:
                 return super.onOptionsItemSelected( item );
         }
