@@ -6,22 +6,22 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.util.List;
 
 @Dao
-public interface EvilCharacterDAO {
+public interface CharacterDAO {
 
     @Insert
-    long insert(EvilCharacter character);
+    long insert(Character character);
 
     @Delete
-    int delete(EvilCharacter character);
+    int delete(Character character);
 
     @Update
-    int update(EvilCharacter character);
+    int update(Character character);
 
-    @Query( "SELECT * FROM evil_characters" )
-    List<EvilCharacter> getAllCharacters();
+    @Query( "SELECT * FROM characters" )
+    List<Character> getAllCharacters();
 }

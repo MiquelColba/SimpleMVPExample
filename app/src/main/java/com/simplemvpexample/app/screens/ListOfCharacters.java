@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.db.CharactersDB;
 import com.simplemvpexample.app.data.db.DBListener;
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharactersAvailable(List<EvilCharacter> characters) {
+    public void onCharactersAvailable(List<Character> characters) {
 
         if (characters != null && !characters.isEmpty()) {
             if (adapter != null) {
@@ -78,7 +78,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharacterInserted(EvilCharacter character) {
+    public void onCharacterInserted(Character character) {
         if (character != null && adapter != null) {
             adapter.insertCharacter( character );
             if (adapter.getItemCount() > 0) {
@@ -99,13 +99,13 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharacterUpdated(EvilCharacter character) {
+    public void onCharacterUpdated(Character character) {
         if (character != null && adapter != null) {
             adapter.updateCharacter( character );
         }
     }
 
-    public void viewCharactersDetails(EvilCharacter character) {
+    public void viewCharactersDetails(Character character) {
         Intent detailsIntent = new Intent( this, NewCharacter.class );
         detailsIntent.putExtra( "character", character );
         startActivity( detailsIntent );

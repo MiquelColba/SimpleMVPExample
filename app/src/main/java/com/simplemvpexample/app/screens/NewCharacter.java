@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.db.CharactersDB;
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -40,7 +40,7 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     private EditText name;
     private EditText movie;
     private FloatingActionButton editPicture;
-    private EvilCharacter character;
+    private Character character;
     private CharactersDB charactersDB;
 
     private boolean isEdit = false;
@@ -95,7 +95,7 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
             }
 
         } else {
-            character = new EvilCharacter();
+            character = new Character();
             setImagePicture( null );
         }
 
@@ -131,27 +131,31 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     private void openImageChooser() {
 
 
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
+        if (!storagePermission) {
+            Toast.makeText( this, R.string.storage_permission_needed, Toast.LENGTH_LONG ).show();
+        } else {
+            Intent photoPickerIntent = new Intent( Intent.ACTION_PICK );
+            photoPickerIntent.setType( "image/*" );
 
-        Intent chooser = Intent.createChooser(photoPickerIntent, getString( R.string.image_chooser_title ));
+            Intent chooser = Intent.createChooser( photoPickerIntent, getString( R.string.image_chooser_title ) );
 
-        if (cameraPermission && storagePermission) {
+            if (cameraPermission) {
 
 
-            File photoFile =  extFile();
+                File photoFile = extFile();
 
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent cameraIntent = new Intent( MediaStore.ACTION_IMAGE_CAPTURE );
 
-            if (photoFile != null) {
+                if (photoFile != null) {
 
-                cameraIntent.putExtra( MediaStore.EXTRA_OUTPUT, Uri.fromFile( photoFile )); // photoUri );
+                    cameraIntent.putExtra( MediaStore.EXTRA_OUTPUT, Uri.fromFile( photoFile ) ); // photoUri );
+                }
+
+                chooser.putExtra( Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent} );
             }
 
-            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { cameraIntent });
+            startActivityForResult( chooser, IMAGE_SELECTION );
         }
-
-        startActivityForResult(chooser, IMAGE_SELECTION );
 
     }
 

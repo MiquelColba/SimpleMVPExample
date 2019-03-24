@@ -1,16 +1,16 @@
 package com.simplemvpexample.app.data.db;
 
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.util.List;
 
 public interface DBListener {
 
-    void onCharactersAvailable(List<EvilCharacter> characters);
+    void onCharactersAvailable(List<Character> characters);
 
     void onCharacterDeleted(int characterID);
 
-    void onCharacterUpdated(EvilCharacter character);
+    void onCharacterUpdated(Character character);
 
-    void onCharacterInserted(EvilCharacter character);
+    void onCharacterInserted(Character character);
 }

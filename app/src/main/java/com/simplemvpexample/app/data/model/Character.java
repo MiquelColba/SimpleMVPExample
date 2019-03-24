@@ -6,8 +6,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-@Entity(tableName = "evil_characters")
-public class EvilCharacter implements Parcelable {
+@Entity(tableName = "characters")
+public class Character implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -20,18 +20,18 @@ public class EvilCharacter implements Parcelable {
 
     private String image;
 
-    public EvilCharacter() {
+    public Character() {
     }
 
-    public static final Creator<EvilCharacter> CREATOR = new Creator<EvilCharacter>() {
+    public static final Creator<Character> CREATOR = new Creator<Character>() {
         @Override
-        public EvilCharacter createFromParcel(Parcel in) {
-            return new EvilCharacter( in );
+        public Character createFromParcel(Parcel in) {
+            return new Character( in );
         }
 
         @Override
-        public EvilCharacter[] newArray(int size) {
-            return new EvilCharacter[size];
+        public Character[] newArray(int size) {
+            return new Character[size];
         }
     };
 
@@ -53,7 +53,7 @@ public class EvilCharacter implements Parcelable {
         }
     }
 
-    public EvilCharacter(Parcel input) {
+    public Character(Parcel input) {
 
         this.id = input.readInt();
         this.name = input.readString();

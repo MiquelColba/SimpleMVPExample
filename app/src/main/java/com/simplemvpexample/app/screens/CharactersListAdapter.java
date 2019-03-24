@@ -1,6 +1,5 @@
 package com.simplemvpexample.app.screens;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -12,14 +11,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.simplemvpexample.app.R;
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> implements ItemClickListener {
 
-    private List<EvilCharacter> characters;
+    private List<Character> characters;
     private ListOfCharacters parentActivity;
 
     private static String TAG = "EvilCharacters";
@@ -43,7 +42,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
     @Override
     public void onBindViewHolder(@NonNull CharacterViewHolder viewHolder, int position) {
 
-        EvilCharacter eC = characters.get( position );
+        Character eC = characters.get( position );
 
         viewHolder.name.setText( eC.getName() );
         viewHolder.movie.setText( eC.getMovie() );
@@ -77,7 +76,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         return characters.size();
     }
 
-    public void setData(List<EvilCharacter> listOfCharacters) {
+    public void setData(List<Character> listOfCharacters) {
 
         if (characters != null && !characters.isEmpty()) {
             characters.clear();
@@ -114,7 +113,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         }
     }
 
-    public void updateCharacter(EvilCharacter character) {
+    public void updateCharacter(Character character) {
 
         if (characters != null && !characters.isEmpty()) {
 
@@ -137,7 +136,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         }
     }
 
-    public void insertCharacter(EvilCharacter character) {
+    public void insertCharacter(Character character) {
 
         if (characters == null) {
             characters = new ArrayList<>(  );

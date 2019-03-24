@@ -16,5 +16,6 @@
     <string name="menu_delete">Delete</string>
 
     <string name="image_chooser_title">Image Chooser</string>
+    <string name="storage_permission_needed">You need to grant storage permission to set a picture</string>
 
 </resources>

@@ -3,13 +3,13 @@ package com.simplemvpexample.app.data.db;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.util.List;
 
 public class CharactersDB {
 
-    private EvilCharacterDAO characterDAO;
+    private CharacterDAO characterDAO;
     private DBListener dbListener;
 
     private static volatile CharactersDB charactersDB;
@@ -32,15 +32,15 @@ public class CharactersDB {
 
     }
 
-    public void insertCharacter(EvilCharacter character) {
+    public void insertCharacter(Character character) {
        new insertAsyncTask( characterDAO , dbListener).execute( character );
     }
 
-    public void deleteCharacter(EvilCharacter character) {
+    public void deleteCharacter(Character character) {
         new deleteAsyncTask( characterDAO, dbListener ).execute( character );
     }
 
-    public void updateCharacter(EvilCharacter character) {
+    public void updateCharacter(Character character) {
         new updateAsyncTask( characterDAO, dbListener ).execute( character );
     }
 
@@ -56,21 +56,21 @@ public class CharactersDB {
         dbListener = null;
     }
 
-    private static class insertAsyncTask extends AsyncTask<EvilCharacter, Void, EvilCharacter> {
+    private static class insertAsyncTask extends AsyncTask<Character, Void, Character> {
 
-        private EvilCharacterDAO mAsyncTaskDao;
+        private CharacterDAO mAsyncTaskDao;
         private DBListener dbListener;
 
-        insertAsyncTask(EvilCharacterDAO dao, DBListener listener) {
+        insertAsyncTask(CharacterDAO dao, DBListener listener) {
 
             mAsyncTaskDao = dao;
             dbListener = listener;
         }
 
         @Override
-        protected EvilCharacter doInBackground(final EvilCharacter... params) {
+        protected Character doInBackground(final Character... params) {
 
-            EvilCharacter character = params[0];
+            Character character = params[0];
 
             long id = mAsyncTaskDao.insert(character);
 
@@ -80,7 +80,7 @@ public class CharactersDB {
         }
 
         @Override
-        protected void onPostExecute(EvilCharacter character) {
+        protected void onPostExecute(Character character) {
 
             if (dbListener != null) {
                 dbListener.onCharacterInserted( character );
@@ -90,21 +90,21 @@ public class CharactersDB {
         }
     }
 
-    private static class deleteAsyncTask extends AsyncTask<EvilCharacter, Void, Integer> {
+    private static class deleteAsyncTask extends AsyncTask<Character, Void, Integer> {
 
-        private EvilCharacterDAO mAsyncTaskDao;
+        private CharacterDAO mAsyncTaskDao;
         private DBListener dbListener;
 
-        deleteAsyncTask(EvilCharacterDAO dao, DBListener listener) {
+        deleteAsyncTask(CharacterDAO dao, DBListener listener) {
 
             mAsyncTaskDao = dao;
             dbListener = listener;
         }
 
         @Override
-        protected Integer doInBackground(final EvilCharacter... params) {
+        protected Integer doInBackground(final Character... params) {
 
-            EvilCharacter character = params[0];
+            Character character = params[0];
 
             int rowsDeleted = mAsyncTaskDao.delete(character);
 
@@ -124,20 +124,20 @@ public class CharactersDB {
         }
     }
 
-    private static class updateAsyncTask extends AsyncTask<EvilCharacter, Void, EvilCharacter> {
+    private static class updateAsyncTask extends AsyncTask<Character, Void, Character> {
 
-        private EvilCharacterDAO mAsyncTaskDao;
+        private CharacterDAO mAsyncTaskDao;
         private DBListener dbListener;
 
-        updateAsyncTask(EvilCharacterDAO dao, DBListener listener) {
+        updateAsyncTask(CharacterDAO dao, DBListener listener) {
             mAsyncTaskDao = dao;
             dbListener = listener;
         }
 
         @Override
-        protected EvilCharacter doInBackground(final EvilCharacter... params) {
+        protected Character doInBackground(final Character... params) {
 
-            EvilCharacter character = params[0];
+            Character character = params[0];
             int rowsUpdated = mAsyncTaskDao.update(character);
 
             if (rowsUpdated == 1) {
@@ -148,7 +148,7 @@ public class CharactersDB {
         }
 
         @Override
-        protected void onPostExecute(EvilCharacter chracter) {
+        protected void onPostExecute(Character chracter) {
 
             if (dbListener != null) {
                 dbListener.onCharacterUpdated( chracter );
@@ -157,18 +157,18 @@ public class CharactersDB {
         }
     }
 
-    private static class getCharactersAsyncTask extends AsyncTask<Void, Void, List<EvilCharacter>> {
+    private static class getCharactersAsyncTask extends AsyncTask<Void, Void, List<Character>> {
 
-        private EvilCharacterDAO mAsyncTaskDao;
+        private CharacterDAO mAsyncTaskDao;
         private DBListener dbListener;
 
-        getCharactersAsyncTask(EvilCharacterDAO dao, DBListener listener) {
+        getCharactersAsyncTask(CharacterDAO dao, DBListener listener) {
             mAsyncTaskDao = dao;
             dbListener = listener;
         }
 
         @Override
-        protected void onPostExecute(List<EvilCharacter> evilCharacters) {
+        protected void onPostExecute(List<Character> evilCharacters) {
             if (dbListener != null) {
 
                 dbListener.onCharactersAvailable( evilCharacters );
@@ -178,7 +178,7 @@ public class CharactersDB {
         }
 
         @Override
-        protected List<EvilCharacter> doInBackground(Void... voids) {
+        protected List<Character> doInBackground(Void... voids) {
             return mAsyncTaskDao.getAllCharacters();
         }
     }
