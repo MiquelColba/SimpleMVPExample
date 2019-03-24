@@ -4,13 +4,15 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,15 +28,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.db.CharactersDB;
-import com.simplemvpexample.app.data.model.EvilCharacter;
-
-import org.w3c.dom.Text;
+import com.simplemvpexample.app.data.model.Character;
 
 import java.io.File;
-import java.util.List;
-
-import pl.aprilapps.easyphotopicker.DefaultCallback;
-import pl.aprilapps.easyphotopicker.EasyImage;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class NewCharacter extends AppCompatActivity implements TextView.OnEditorActionListener {
 
@@ -42,16 +40,24 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     private EditText name;
     private EditText movie;
     private FloatingActionButton editPicture;
-    private EvilCharacter character;
+    private Character character;
     private CharactersDB charactersDB;
 
-    private static final int CAMERA_PERMISSION_CHECK = 44;
-    private static final int STORAGE_PERMISSION_CHECK = 55;
+    private boolean isEdit = false;
+    String currentPhotoPath = null;
+    boolean cameraPermission = false;
+    boolean storagePermission = false;
+
+    private static final int PERMISSION_CHECK = 44;
+
+    private static final int IMAGE_SELECTION = 122;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.new_character );
+
+        charactersDB = CharactersDB.getInstance( this );
 
         picture = findViewById( R.id.ivNewPicture );
 
@@ -72,9 +78,27 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
             }
         } );
 
-        character = new EvilCharacter();
-        charactersDB = new CharactersDB( this );
-        setImagePicture( null );
+        if (getIntent().hasExtra( "character" )) {
+            // Visualize character information
+            character = getIntent().getParcelableExtra( "character" );
+
+            if (character != null) {
+
+                isEdit = true;
+
+                name.setText( character.getName() );
+                movie.setText( character.getMovie() );
+
+                Uri imageUri = character.getImage() != null ? Uri.parse( character.getImage() ) : null;
+
+                setImagePicture( imageUri );
+            }
+
+        } else {
+            character = new Character();
+            setImagePicture( null );
+        }
+
     }
 
     @Override
@@ -106,45 +130,91 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
 
     private void openImageChooser() {
 
-        // Configure EasyImage to disable multiple image pick from gallery
-        EasyImage.configuration( this )
-                .setImagesFolderName( "Evil characters" )
-                .setAllowMultiplePickInGallery( false );
 
-        EasyImage.openChooserWithGallery( this, "Image Chooser", 0 );
+        if (!storagePermission) {
+            Toast.makeText( this, R.string.storage_permission_needed, Toast.LENGTH_LONG ).show();
+        } else {
+            Intent photoPickerIntent = new Intent( Intent.ACTION_PICK );
+            photoPickerIntent.setType( "image/*" );
 
+            Intent chooser = Intent.createChooser( photoPickerIntent, getString( R.string.image_chooser_title ) );
+
+            if (cameraPermission) {
+
+
+                File photoFile = extFile();
+
+                Intent cameraIntent = new Intent( MediaStore.ACTION_IMAGE_CAPTURE );
+
+                if (photoFile != null) {
+
+                    cameraIntent.putExtra( MediaStore.EXTRA_OUTPUT, Uri.fromFile( photoFile ) ); // photoUri );
+                }
+
+                chooser.putExtra( Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cameraIntent} );
+            }
+
+            startActivityForResult( chooser, IMAGE_SELECTION );
+        }
+
+    }
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult( requestCode, resultCode, data );
 
-        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new DefaultCallback() {
-            @Override
-            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
-                //Some error handling
+        if (requestCode == IMAGE_SELECTION && resultCode == RESULT_OK) {
+
+            if ( data != null ) {
+
+                String path = getRealPathFromURI( this, data.getData() );
+                Uri imageUri = Uri.fromFile( new File( path ) );
+                setImagePicture( imageUri );
+
+            } else if (currentPhotoPath != null) {
+
+                galleryAddPic();
+
+                setImagePicture( Uri.fromFile( new File( currentPhotoPath ) ) );
+
+                currentPhotoPath = null;
             }
 
-            @Override
-            public void onCanceled(EasyImage.ImageSource source, int type) {
-                // Cancel handling, you might wanna remove taken photo if it was canceled
-                if (source == EasyImage.ImageSource.CAMERA_IMAGE) {
-                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(NewCharacter.this);
-                    if (photoFile != null) photoFile.delete();
-                }
-            }
+        }
 
-            @Override
-            public void onImagesPicked(List<File> imagesFiles, EasyImage.ImageSource source, int type) {
-                //Handle the image
+    }
 
-                if (imagesFiles != null && imagesFiles.size() > 0) {
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
 
-                    Uri imageUri = Uri.fromFile( imagesFiles.get( 0 ) );
-                    setImagePicture( imageUri );
-                }
-            }
-        });
+    private File extFile() {
+        String name = new SimpleDateFormat( "yyyyMMdd_HHmmss" ).format( new Date(  ) );
+
+        File extStorage = Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_PICTURES );
+        File f = new File( extStorage, name + ".jpg" );
+
+        currentPhotoPath = f.getAbsolutePath();
+        return f;
     }
 
     private void setImagePicture(Uri imageUri) {
@@ -162,6 +232,11 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
 
         Glide.with( this )
                 .load( imageUri )
+                .error(
+                        Glide.with( this )
+                                .load( getDrawable( R.drawable.no_picture ) )
+                                .circleCrop()
+                )
                 .circleCrop()
                 .into( picture );
     }
@@ -170,7 +245,13 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate( R.menu.add_edit_menu, menu );
+
+        if (isEdit) {
+            inflater.inflate( R.menu.save_delete_menu, menu );
+        } else {
+            inflater.inflate( R.menu.save_menu, menu );
+        }
+
         return true;
     }
 
@@ -181,12 +262,25 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
             case R.id.save:
                 // Check that character has at least a name and a movie
                 if (validateCharacter()) {
-                    // Save in DB and go back
-                    charactersDB.insertCharacter( character );
+
+                    if (!isEdit) {
+                        // Save in DB and go back
+                        charactersDB.insertCharacter( character );
+                    } else {
+                        // Update element in DB
+                        charactersDB.updateCharacter( character );
+                    }
+
                     finish();
                 }
 
                 return true;
+
+            case R.id.delete:
+                charactersDB.deleteCharacter( character );
+                finish();
+                return true;
+
             default:
                 return super.onOptionsItemSelected( item );
         }
@@ -215,36 +309,47 @@ public class NewCharacter extends AppCompatActivity implements TextView.OnEditor
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult( requestCode, permissions, grantResults );
 
-        switch (requestCode) {
-            case CAMERA_PERMISSION_CHECK: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openImageChooser();
+        if (requestCode == PERMISSION_CHECK && grantResults.length > 0) {
+
+            for (int i = 0; i < grantResults.length; i++) {
+
+                if (permissions[i].equalsIgnoreCase( Manifest.permission.CAMERA )) {
+
+                    cameraPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+
+                } else if (permissions[i].equalsIgnoreCase( Manifest.permission.WRITE_EXTERNAL_STORAGE )) {
+
+                    storagePermission = grantResults[i] == PackageManager.PERMISSION_GRANTED;
                 }
-                return;
-            }
-            case STORAGE_PERMISSION_CHECK: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openImageChooser();
-                }
-                return;
             }
         }
+
+        openImageChooser();
     }
 
     private boolean hasPermissions() {
 
         PackageManager packageManager = getPackageManager();
 
-        if (packageManager.checkPermission( Manifest.permission.CAMERA, getPackageName() ) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions( new String[] {Manifest.permission.CAMERA}, CAMERA_PERMISSION_CHECK );
-            return false;
+        cameraPermission = packageManager.checkPermission( Manifest.permission.CAMERA, getPackageName() ) == PackageManager.PERMISSION_GRANTED;
+
+        storagePermission = packageManager.checkPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE, getPackageName() ) == PackageManager.PERMISSION_GRANTED;
+
+        String[] permissions;
+
+        if (!cameraPermission && !storagePermission) {
+            permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        } else if (!cameraPermission) {
+            permissions = new String[]{Manifest.permission.CAMERA};
+        } else if (!storagePermission) {
+            permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        } else {
+            return true;
         }
 
-        if (packageManager.checkPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE, getPackageName() ) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions( new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CHECK );
-            return false;
-        }
+        requestPermissions( permissions, PERMISSION_CHECK );
 
-        return true;
+        return false;
+
     }
 }

@@ -5,12 +5,12 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-import com.simplemvpexample.app.data.model.EvilCharacter;
+import com.simplemvpexample.app.data.model.Character;
 
-@Database( entities = {EvilCharacter.class}, version = 1, exportSchema = false)
+@Database( entities = {Character.class}, version = 1, exportSchema = false)
 public abstract class AppRoomDatabase extends RoomDatabase {
 
-    public abstract EvilCharacterDAO characterDAO();
+    public abstract CharacterDAO characterDAO();
 
     private static volatile AppRoomDatabase INSTANCE;
 
