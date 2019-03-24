@@ -14,6 +14,8 @@ public interface I_ListOfCPresenter {
 
     void attachAdapter(I_ListOfCAdapter adapter);
 
+    void onAttach(I_ListOfCView view);
+
     void startPresenter();
 
     void onViewDestroy();

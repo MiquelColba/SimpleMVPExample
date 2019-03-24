@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".CharactersApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,10 +16,10 @@
         android:theme="@style/AppTheme">
         <activity android:name=".screens.character.CharacterView"
             android:label="@string/character"
-            android:parentActivityName=".screens.charac_list.ListOfCharacters"
+            android:parentActivityName=".screens.charac_list.ListOfCharactersView"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".screens.charac_list.ListOfCharacters"
+            android:name=".screens.charac_list.ListOfCharactersView"
             android:label="@string/list_of_characters"
             android:screenOrientation="portrait">
             <intent-filter>

@@ -8,16 +8,18 @@ import com.simplemvpexample.app.screens.charac_list.interfaces.I_ListOfCView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ListOfCharactersPresenter implements I_ListOfCPresenter {
 
     private I_ListOfCView view;
     private I_ListOfCAdapter adapter;
     private I_ListOfCInteractor interactor;
 
-    public ListOfCharactersPresenter(I_ListOfCView view) {
-        this.view = view;
-        interactor = new ListOfCharactersInteractor( this.view.getContext() );
-        interactor.onAttach( this );
+    @Inject
+    public ListOfCharactersPresenter(I_ListOfCInteractor interactor) {
+        this.interactor = interactor;
+        this.interactor.onAttach( this );
     }
 
     @Override
@@ -28,6 +30,11 @@ public class ListOfCharactersPresenter implements I_ListOfCPresenter {
         if (!interactor.hasCharacters()) {
             view.showNoCharacters();
         }
+    }
+
+    @Override
+    public void onAttach(I_ListOfCView view) {
+        this.view = view;
     }
 
     @Override
@@ -47,8 +54,9 @@ public class ListOfCharactersPresenter implements I_ListOfCPresenter {
     public void onCharactersAvailable(List<CustomCharacter> characters) {
         if (!characters.isEmpty()) {
             view.hideNoCharacters();
-            adapter.setCharacters( characters );
         }
+
+        adapter.setCharacters( characters );
     }
 
     @Override
@@ -67,7 +75,7 @@ public class ListOfCharactersPresenter implements I_ListOfCPresenter {
     @Override
     public void attachAdapter(I_ListOfCAdapter adapter) {
         this.adapter = adapter;
-        this.adapter.onAttach( this );
+        this.adapter.onAttachPresenter( this );
     }
 
     @Override

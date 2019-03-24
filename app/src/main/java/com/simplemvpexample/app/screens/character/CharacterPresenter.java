@@ -1,15 +1,12 @@
 package com.simplemvpexample.app.screens.character;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 
-import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.model.CustomCharacter;
 import com.simplemvpexample.app.screens.character.interfaces.I_CharacterInteractor;
 import com.simplemvpexample.app.screens.character.interfaces.I_CharacterPresenter;
@@ -18,6 +15,8 @@ import com.simplemvpexample.app.screens.character.interfaces.I_CharacterView;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.inject.Inject;
 
 public class CharacterPresenter implements I_CharacterPresenter {
 
@@ -32,19 +31,26 @@ public class CharacterPresenter implements I_CharacterPresenter {
 
     private static final int PERMISSION_CHECK = 44;
 
-    public CharacterPresenter(I_CharacterView view) {
+    @Inject
+    public CharacterPresenter(I_CharacterInteractor interactor) {
+        this.interactor = interactor;
+        this.interactor.onAttachPresenter( this );
+    }
+
+    @Override
+    public void onAttach(I_CharacterView view) {
         this.view = view;
-        this.interactor = new CharacterInteractor( view.getContext() );
-        interactor.onAttachPresenter( this );
+    }
+
+    @Override
+    public void newCharacter() {
         character = new CustomCharacter();
         isEdit = false;
         view.setNoPicture();
     }
 
-    public CharacterPresenter(I_CharacterView view, CustomCharacter character) {
-        this.view = view;
-        this.interactor = new CharacterInteractor( view.getContext() );
-        interactor.onAttachPresenter( this );
+    @Override
+    public void editCharacter(CustomCharacter character) {
         this.character = character;
         isEdit = true;
 
@@ -73,7 +79,7 @@ public class CharacterPresenter implements I_CharacterPresenter {
 
         if (data != null) {
 
-            String path = getRealPathFromURI( view.getContext(), data.getData() );
+            String path = interactor.getRealPathFromURI( data.getData() );
             Uri imageUri = Uri.fromFile( new File( path ) );
             character.setImage( imageUri.toString() );
             view.setImage( imageUri );
@@ -131,22 +137,6 @@ public class CharacterPresenter implements I_CharacterPresenter {
         view.sendScanBroadcast( mediaScanIntent );
     }
 
-
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query( contentUri, proj, null, null, null );
-            int column_index = cursor.getColumnIndexOrThrow( MediaStore.Images.Media.DATA );
-            cursor.moveToFirst();
-            return cursor.getString( column_index );
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
     @Override
     public void onRequestPermissionResults(int reqCode, String[] permissions, int[] grantResults) {
 
@@ -185,12 +175,9 @@ public class CharacterPresenter implements I_CharacterPresenter {
 
     private boolean checkPermissions() {
 
-        PackageManager packageManager = view.getContext().getPackageManager();
-        String packageName = view.getContext().getPackageName();
+        cameraPermission = interactor.hasCameraPermission();
 
-        cameraPermission = packageManager.checkPermission( Manifest.permission.CAMERA, packageName ) == PackageManager.PERMISSION_GRANTED;
-
-        storagePermission = packageManager.checkPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE, packageName ) == PackageManager.PERMISSION_GRANTED;
+        storagePermission = interactor.hasStoragePermission();
 
         if (!storagePermission || !cameraPermission) {
             requestPermissions();
@@ -208,7 +195,7 @@ public class CharacterPresenter implements I_CharacterPresenter {
             Intent photoPickerIntent = new Intent( Intent.ACTION_PICK );
             photoPickerIntent.setType( "image/*" );
 
-            Intent chooser = Intent.createChooser( photoPickerIntent, view.getContext().getString( R.string.image_chooser_title ) );
+            Intent chooser = Intent.createChooser( photoPickerIntent, "Image Chooser" );
 
             if (cameraPermission) {
 

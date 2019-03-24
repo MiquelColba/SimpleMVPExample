@@ -22,10 +22,10 @@ import java.util.List;
 public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> implements ItemClickListener, I_ListOfCAdapter {
 
     private List<CustomCharacter> characters;
-    private ListOfCharacters parentActivity;
+    private ListOfCharactersView parentActivity;
     private I_ListOfCPresenter presenter;
 
-    public CharactersListAdapter(ListOfCharacters parentActivity) {
+    public CharactersListAdapter(ListOfCharactersView parentActivity) {
         characters = new ArrayList<>();
         this.parentActivity = parentActivity;
     }
@@ -105,7 +105,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
     }
 
     @Override
-    public void onAttach(I_ListOfCPresenter presenter) {
+    public void onAttachPresenter(I_ListOfCPresenter presenter) {
         this.presenter = presenter;
     }
 

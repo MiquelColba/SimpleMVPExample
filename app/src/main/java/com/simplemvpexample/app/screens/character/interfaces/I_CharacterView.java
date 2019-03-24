@@ -1,12 +1,9 @@
 package com.simplemvpexample.app.screens.character.interfaces;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
 public interface I_CharacterView {
-
-    Context getContext();
 
     void setImage(Uri imageUri);
 
