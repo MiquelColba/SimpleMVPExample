@@ -14,7 +14,7 @@ public interface I_ListOfCAdapter {
 
     void characterUpdated(int index);
 
-    void onAttach(I_ListOfCPresenter presenter);
+    void onAttachPresenter(I_ListOfCPresenter presenter);
 
     void onDetach();
 

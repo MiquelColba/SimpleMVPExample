@@ -11,6 +11,4 @@ public interface I_ListOfCView {
     void hideNoCharacters();
 
     void viewCharacterDetails(CustomCharacter character);
-
-    Context getContext();
 }

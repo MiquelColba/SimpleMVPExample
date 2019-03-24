@@ -1,8 +1,5 @@
 package com.simplemvpexample.app.screens.charac_list;
 
-import android.content.Context;
-
-import com.simplemvpexample.app.data.db.CharactersDB;
 import com.simplemvpexample.app.data.db.interfaces.DBHelper;
 import com.simplemvpexample.app.data.db.interfaces.DBListener;
 import com.simplemvpexample.app.data.model.CustomCharacter;
@@ -12,15 +9,18 @@ import com.simplemvpexample.app.screens.charac_list.interfaces.I_ListOfCPresente
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ListOfCharactersInteractor implements I_ListOfCInteractor, DBListener {
 
     private DBHelper dbHelper;
     private I_ListOfCPresenter presenter;
     private List<CustomCharacter> characters;
 
-    public ListOfCharactersInteractor(Context context) {
-        this.dbHelper = CharactersDB.getInstance( context );
-        dbHelper.registerListener( this );
+    @Inject
+    public ListOfCharactersInteractor(DBHelper dbHelper) {
+        this.dbHelper = dbHelper;
+        this.dbHelper.registerListener( this );
     }
 
     @Override
@@ -37,11 +37,6 @@ public class ListOfCharactersInteractor implements I_ListOfCInteractor, DBListen
     @Override
     public void getCharacters() {
         dbHelper.getAllCharacters();
-    }
-
-    @Override
-    public CustomCharacter getCharacter(int index) {
-        return null;
     }
 
     @Override

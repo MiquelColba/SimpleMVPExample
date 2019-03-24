@@ -7,9 +7,12 @@ import com.simplemvpexample.app.data.db.dao.CharacterDAO;
 import com.simplemvpexample.app.data.db.interfaces.DBHelper;
 import com.simplemvpexample.app.data.db.interfaces.DBListener;
 import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.di.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class CharactersDB implements DBHelper {
 
@@ -18,22 +21,12 @@ public class CharactersDB implements DBHelper {
 
     private static volatile CharactersDB charactersDB;
 
-
-    public static CharactersDB getInstance(final Context context) {
-
-        if (charactersDB == null) {
-            charactersDB = new CharactersDB(context);
-        }
-
-        return charactersDB;
-    }
-
-    private CharactersDB(Context context) {
+    @Inject
+    public CharactersDB(@ApplicationContext Context context) {
 
             AppRoomDatabase db = AppRoomDatabase.getDatabase( context );
 
             characterDAO = db.characterDAO();
-
     }
 
     public void insertCharacter(CustomCharacter character) {

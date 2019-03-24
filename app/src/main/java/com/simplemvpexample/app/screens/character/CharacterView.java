@@ -21,10 +21,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.simplemvpexample.app.CharactersApp;
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.di.component.ActivityComponent;
+import com.simplemvpexample.app.di.component.DaggerActivityComponent;
+import com.simplemvpexample.app.di.module.ActivityModule;
 import com.simplemvpexample.app.screens.character.interfaces.I_CharacterPresenter;
 import com.simplemvpexample.app.screens.character.interfaces.I_CharacterView;
+
+import javax.inject.Inject;
 
 public class CharacterView extends AppCompatActivity implements TextView.OnEditorActionListener, I_CharacterView {
 
@@ -33,11 +39,14 @@ public class CharacterView extends AppCompatActivity implements TextView.OnEdito
     private EditText movie;
     private FloatingActionButton editPicture;
 
+    private ActivityComponent activityComponent;
+
     private boolean isEdit = false;
 
     private static final int IMAGE_SELECTION = 122;
 
-    private I_CharacterPresenter presenter;
+    @Inject
+    I_CharacterPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +57,10 @@ public class CharacterView extends AppCompatActivity implements TextView.OnEdito
         name = findViewById( R.id.etName );
         movie = findViewById( R.id.etMovie );
         editPicture = findViewById( R.id.fabEdit );
+
+        getActivityComponent().inject( this );
+
+        presenter.onAttach( this );
 
         name.setOnEditorActionListener( this );
         movie.setOnEditorActionListener( this );
@@ -66,19 +79,27 @@ public class CharacterView extends AppCompatActivity implements TextView.OnEdito
 
             name.setText( editableCharacter.getName() );
             movie.setText( editableCharacter.getMovie() );
-
-            presenter = new CharacterPresenter( this, editableCharacter );
-
             isEdit = true;
 
+            presenter.editCharacter( editableCharacter );
+
         } else {
-            presenter = new CharacterPresenter( this );
+
+            presenter.newCharacter();
         }
     }
 
-    @Override
-    public Context getContext() {
-        return this;
+    public ActivityComponent getActivityComponent() {
+        if (activityComponent == null) {
+
+            activityComponent = DaggerActivityComponent
+                    .builder()
+                    .activityModule( new ActivityModule( this ) )
+                    .applicationComponent( CharactersApp.get( this ).getComponent() )
+                    .build();
+        }
+
+        return activityComponent;
     }
 
     @Override
