@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 @Entity(tableName = "characters")
-public class Character implements Parcelable {
+public class CustomCharacter implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -20,18 +20,18 @@ public class Character implements Parcelable {
 
     private String image;
 
-    public Character() {
+    public CustomCharacter() {
     }
 
-    public static final Creator<Character> CREATOR = new Creator<Character>() {
+    public static final Creator<CustomCharacter> CREATOR = new Creator<CustomCharacter>() {
         @Override
-        public Character createFromParcel(Parcel in) {
-            return new Character( in );
+        public CustomCharacter createFromParcel(Parcel in) {
+            return new CustomCharacter( in );
         }
 
         @Override
-        public Character[] newArray(int size) {
-            return new Character[size];
+        public CustomCharacter[] newArray(int size) {
+            return new CustomCharacter[size];
         }
     };
 
@@ -53,7 +53,7 @@ public class Character implements Parcelable {
         }
     }
 
-    public Character(Parcel input) {
+    public CustomCharacter(Parcel input) {
 
         this.id = input.readInt();
         this.name = input.readString();

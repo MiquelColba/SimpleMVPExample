@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.screens;
+package com.simplemvpexample.app.screens.charac_list;
 
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
@@ -12,7 +12,8 @@ import android.widget.TextView;
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.db.CharactersDB;
 import com.simplemvpexample.app.data.db.DBListener;
-import com.simplemvpexample.app.data.model.Character;
+import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.screens.character.CharacterView;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
         addCharacter.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent( ListOfCharacters.this, NewCharacter.class );
+                Intent intent = new Intent( ListOfCharacters.this, CharacterView.class );
                 startActivity( intent );
             }
         } );
@@ -65,7 +66,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharactersAvailable(List<Character> characters) {
+    public void onCharactersAvailable(List<CustomCharacter> characters) {
 
         if (characters != null && !characters.isEmpty()) {
             if (adapter != null) {
@@ -78,7 +79,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharacterInserted(Character character) {
+    public void onCharacterInserted(CustomCharacter character) {
         if (character != null && adapter != null) {
             adapter.insertCharacter( character );
             if (adapter.getItemCount() > 0) {
@@ -99,14 +100,14 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharacterUpdated(Character character) {
+    public void onCharacterUpdated(CustomCharacter character) {
         if (character != null && adapter != null) {
             adapter.updateCharacter( character );
         }
     }
 
-    public void viewCharactersDetails(Character character) {
-        Intent detailsIntent = new Intent( this, NewCharacter.class );
+    public void viewCharactersDetails(CustomCharacter character) {
+        Intent detailsIntent = new Intent( this, CharacterView.class );
         detailsIntent.putExtra( "character", character );
         startActivity( detailsIntent );
     }
@@ -114,7 +115,7 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     @Override
     protected void onDestroy() {
         if (charactersDB != null) {
-            charactersDB.unregisterListener();
+            charactersDB.unregisterListener(this);
         }
 
         if (charactersList != null && charactersList.getAdapter() != null) {

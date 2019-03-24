@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.screens;
+package com.simplemvpexample.app.screens.charac_list;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -11,14 +11,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.simplemvpexample.app.R;
-import com.simplemvpexample.app.data.model.Character;
+import com.simplemvpexample.app.data.model.CustomCharacter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> implements ItemClickListener {
 
-    private List<Character> characters;
+    private List<CustomCharacter> characters;
     private ListOfCharacters parentActivity;
 
     private static String TAG = "EvilCharacters";
@@ -42,7 +42,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
     @Override
     public void onBindViewHolder(@NonNull CharacterViewHolder viewHolder, int position) {
 
-        Character eC = characters.get( position );
+        CustomCharacter eC = characters.get( position );
 
         viewHolder.name.setText( eC.getName() );
         viewHolder.movie.setText( eC.getMovie() );
@@ -76,7 +76,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         return characters.size();
     }
 
-    public void setData(List<Character> listOfCharacters) {
+    public void setData(List<CustomCharacter> listOfCharacters) {
 
         if (characters != null && !characters.isEmpty()) {
             characters.clear();
@@ -113,7 +113,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         }
     }
 
-    public void updateCharacter(Character character) {
+    public void updateCharacter(CustomCharacter character) {
 
         if (characters != null && !characters.isEmpty()) {
 
@@ -136,7 +136,7 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         }
     }
 
-    public void insertCharacter(Character character) {
+    public void insertCharacter(CustomCharacter character) {
 
         if (characters == null) {
             characters = new ArrayList<>(  );

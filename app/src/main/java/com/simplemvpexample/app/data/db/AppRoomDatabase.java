@@ -5,9 +5,9 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-import com.simplemvpexample.app.data.model.Character;
+import com.simplemvpexample.app.data.model.CustomCharacter;
 
-@Database( entities = {Character.class}, version = 1, exportSchema = false)
+@Database( entities = {CustomCharacter.class}, version = 1, exportSchema = false)
 public abstract class AppRoomDatabase extends RoomDatabase {
 
     public abstract CharacterDAO characterDAO();
