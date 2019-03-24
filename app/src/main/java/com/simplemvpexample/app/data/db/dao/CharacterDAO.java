@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.data.db;
+package com.simplemvpexample.app.data.db.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.simplemvpexample.app.data.model.Character;
+import com.simplemvpexample.app.data.model.CustomCharacter;
 
 import java.util.List;
 
@@ -14,14 +14,14 @@ import java.util.List;
 public interface CharacterDAO {
 
     @Insert
-    long insert(Character character);
+    long insert(CustomCharacter character);
 
     @Delete
-    int delete(Character character);
+    int delete(CustomCharacter character);
 
     @Update
-    int update(Character character);
+    int update(CustomCharacter character);
 
     @Query( "SELECT * FROM characters" )
-    List<Character> getAllCharacters();
+    List<CustomCharacter> getAllCharacters();
 }

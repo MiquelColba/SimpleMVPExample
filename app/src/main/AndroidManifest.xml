@@ -13,12 +13,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".screens.NewCharacter"
+        <activity android:name=".screens.character.CharacterView"
             android:label="@string/character"
-            android:parentActivityName=".screens.ListOfCharacters"
+            android:parentActivityName=".screens.charac_list.ListOfCharacters"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".screens.ListOfCharacters"
+            android:name=".screens.charac_list.ListOfCharacters"
             android:label="@string/list_of_characters"
             android:screenOrientation="portrait">
             <intent-filter>
