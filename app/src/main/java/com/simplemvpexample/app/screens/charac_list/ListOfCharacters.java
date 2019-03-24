@@ -1,5 +1,6 @@
 package com.simplemvpexample.app.screens.charac_list;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -10,23 +11,20 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.simplemvpexample.app.R;
-import com.simplemvpexample.app.data.db.CharactersDB;
-import com.simplemvpexample.app.data.db.DBListener;
 import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.screens.charac_list.interfaces.I_ListOfCPresenter;
+import com.simplemvpexample.app.screens.charac_list.interfaces.I_ListOfCView;
 import com.simplemvpexample.app.screens.character.CharacterView;
 
-import java.util.List;
-
-public class ListOfCharacters extends AppCompatActivity implements DBListener {
+public class ListOfCharacters extends AppCompatActivity implements I_ListOfCView {
 
     private FloatingActionButton addCharacter;
-    private CharactersDB charactersDB;
     private RecyclerView charactersList;
     private TextView noCharactersMssg;
     private CharactersListAdapter adapter;
     private LinearLayoutManager layoutManager;
 
-    private static String TAG = "EvilCharacters";
+    private I_ListOfCPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +32,15 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
         setContentView( R.layout.list_of_characters );
 
         noCharactersMssg = findViewById( R.id.tvNoCharacters );
-
         addCharacter = findViewById( R.id.fabAdd );
+        charactersList = findViewById( R.id.rvList );
+
+        charactersList.setHasFixedSize( true );
+        adapter = new CharactersListAdapter( this );
+        setUpRecyclerView();
+
+        presenter = new ListOfCharactersPresenter( this );
+        presenter.attachAdapter( adapter );
 
         addCharacter.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -45,15 +50,12 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
             }
         } );
 
-        charactersDB = CharactersDB.getInstance( this );
-        charactersDB.registerListener( this );
+        presenter.startPresenter();
+    }
 
-        charactersList = findViewById( R.id.rvList );
-        charactersList.setHasFixedSize( true );
-        adapter = new CharactersListAdapter( this );
-        setUpRecyclerView();
-
-        charactersDB.getAllCharacters();
+    @Override
+    public Context getContext() {
+        return this;
     }
 
     private void setUpRecyclerView() {
@@ -66,47 +68,17 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
     }
 
     @Override
-    public void onCharactersAvailable(List<CustomCharacter> characters) {
-
-        if (characters != null && !characters.isEmpty()) {
-            if (adapter != null) {
-                noCharactersMssg.setVisibility( View.GONE );
-                adapter.setData( characters );
-            }
-        } else {
-            noCharactersMssg.setVisibility( View.VISIBLE );
-        }
-    }
-
-    @Override
-    public void onCharacterInserted(CustomCharacter character) {
-        if (character != null && adapter != null) {
-            adapter.insertCharacter( character );
-            if (adapter.getItemCount() > 0) {
-                noCharactersMssg.setVisibility( View.GONE );
-            }
-        }
-    }
-
-    @Override
-    public void onCharacterDeleted(int characterID) {
-        if (characterID != -1 && adapter != null) {
-            adapter.deleteCharacter( characterID );
-        }
-    }
-
-    public void noCharactersAvailable() {
+    public void showNoCharacters() {
         noCharactersMssg.setVisibility( View.VISIBLE );
     }
 
     @Override
-    public void onCharacterUpdated(CustomCharacter character) {
-        if (character != null && adapter != null) {
-            adapter.updateCharacter( character );
-        }
+    public void hideNoCharacters() {
+        noCharactersMssg.setVisibility( View.GONE );
     }
 
-    public void viewCharactersDetails(CustomCharacter character) {
+    @Override
+    public void viewCharacterDetails(CustomCharacter character) {
         Intent detailsIntent = new Intent( this, CharacterView.class );
         detailsIntent.putExtra( "character", character );
         startActivity( detailsIntent );
@@ -114,14 +86,13 @@ public class ListOfCharacters extends AppCompatActivity implements DBListener {
 
     @Override
     protected void onDestroy() {
-        if (charactersDB != null) {
-            charactersDB.unregisterListener(this);
-        }
 
         if (charactersList != null && charactersList.getAdapter() != null) {
             adapter = null;
             charactersList.setAdapter( null );
         }
+
+        presenter.onViewDestroy();
 
         super.onDestroy();
     }

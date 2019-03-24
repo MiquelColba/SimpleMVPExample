@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.screens.character;
+package com.simplemvpexample.app.screens.character.interfaces;
 
 import android.content.Context;
 import android.content.Intent;

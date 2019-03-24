@@ -8,10 +8,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.widget.Toast;
 
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterInteractor;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterPresenter;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterView;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -102,10 +104,9 @@ public class CharacterPresenter implements I_CharacterPresenter {
 
     @Override
     public void editPictureClicked() {
-        if (hasPermissions()) {
+
+        if (checkPermissions()) {
             openImageChooser();
-        } else {
-            requestPermissions();
         }
     }
 
@@ -182,7 +183,7 @@ public class CharacterPresenter implements I_CharacterPresenter {
         view.requestPermissions( permissions, PERMISSION_CHECK );
     }
 
-    private boolean hasPermissions() {
+    private boolean checkPermissions() {
 
         PackageManager packageManager = view.getContext().getPackageManager();
         String packageName = view.getContext().getPackageName();
@@ -191,12 +192,15 @@ public class CharacterPresenter implements I_CharacterPresenter {
 
         storagePermission = packageManager.checkPermission( Manifest.permission.WRITE_EXTERNAL_STORAGE, packageName ) == PackageManager.PERMISSION_GRANTED;
 
-        return cameraPermission || storagePermission;
+        if (!storagePermission || !cameraPermission) {
+            requestPermissions();
+            return false;
+        }
 
+        return true;
     }
 
     private void openImageChooser() {
-
 
         if (!storagePermission) {
             view.noStoragePermissionMssg();

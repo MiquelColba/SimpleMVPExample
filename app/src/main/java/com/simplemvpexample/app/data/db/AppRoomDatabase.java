@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.simplemvpexample.app.data.db.dao.CharacterDAO;
 import com.simplemvpexample.app.data.model.CustomCharacter;
 
 @Database( entities = {CustomCharacter.class}, version = 1, exportSchema = false)

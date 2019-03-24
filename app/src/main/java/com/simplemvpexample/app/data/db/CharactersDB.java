@@ -3,12 +3,15 @@ package com.simplemvpexample.app.data.db;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.simplemvpexample.app.data.db.dao.CharacterDAO;
+import com.simplemvpexample.app.data.db.interfaces.DBHelper;
+import com.simplemvpexample.app.data.db.interfaces.DBListener;
 import com.simplemvpexample.app.data.model.CustomCharacter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharactersDB implements DBHelper{
+public class CharactersDB implements DBHelper {
 
     private CharacterDAO characterDAO;
     private List<DBListener> dbListener;

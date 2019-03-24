@@ -12,16 +12,18 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.simplemvpexample.app.R;
 import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.screens.charac_list.interfaces.I_ListOfCAdapter;
+import com.simplemvpexample.app.screens.charac_list.interfaces.I_ListOfCPresenter;
+import com.simplemvpexample.app.screens.charac_list.interfaces.ItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> implements ItemClickListener {
+public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAdapter.CharacterViewHolder> implements ItemClickListener, I_ListOfCAdapter {
 
     private List<CustomCharacter> characters;
     private ListOfCharacters parentActivity;
-
-    private static String TAG = "EvilCharacters";
+    private I_ListOfCPresenter presenter;
 
     public CharactersListAdapter(ListOfCharacters parentActivity) {
         characters = new ArrayList<>();
@@ -76,80 +78,45 @@ public class CharactersListAdapter extends RecyclerView.Adapter<CharactersListAd
         return characters.size();
     }
 
-    public void setData(List<CustomCharacter> listOfCharacters) {
-
+    @Override
+    public void setCharacters(List<CustomCharacter> charactersList) {
         if (characters != null && !characters.isEmpty()) {
             characters.clear();
         }
 
-        characters.addAll( listOfCharacters );
+        characters = charactersList;
 
         notifyDataSetChanged();
     }
 
-    public void deleteCharacter(int characterId) {
-
-        if (characters != null && !characters.isEmpty()) {
-
-            int idx = -1;
-
-            for (int i = 0; i < characters.size(); i++) {
-
-                if (characters.get( i ).getId() == characterId) {
-                    idx = i;
-                    break;
-                }
-            }
-
-            if (idx != -1) {
-                characters.remove( idx );
-
-                if (characters.isEmpty()) {
-                    parentActivity.noCharactersAvailable();
-                }
-
-                notifyItemRemoved( idx );
-            }
-        }
+    @Override
+    public void characterInserted(int index) {
+        notifyItemInserted( index );
     }
 
-    public void updateCharacter(CustomCharacter character) {
-
-        if (characters != null && !characters.isEmpty()) {
-
-            int characterId = character.getId();
-
-            int idx = -1;
-
-            for (int i = 0; i < characters.size(); i++) {
-
-                if (characters.get( i ).getId() == characterId) {
-                    idx = i;
-                    break;
-                }
-            }
-
-            if (idx != -1) {
-                characters.set( idx, character );
-                notifyItemChanged( idx );
-            }
-        }
+    @Override
+    public void characterRemoved(int index) {
+        notifyItemRemoved( index );
     }
 
-    public void insertCharacter(CustomCharacter character) {
+    @Override
+    public void characterUpdated(int index) {
+        notifyItemChanged( index );
+    }
 
-        if (characters == null) {
-            characters = new ArrayList<>(  );
-        }
+    @Override
+    public void onAttach(I_ListOfCPresenter presenter) {
+        this.presenter = presenter;
+    }
 
-        if (characters.add( character )) {
-            notifyItemInserted( characters.size() - 1 );
-        }
+    @Override
+    public void onDetach() {
+        presenter = null;
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        parentActivity.viewCharactersDetails( characters.get( position ) );
+        presenter.onCharacterSelected( characters.get( position ) );
     }
 
     public static class CharacterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

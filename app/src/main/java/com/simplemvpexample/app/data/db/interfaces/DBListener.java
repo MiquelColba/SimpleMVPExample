@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.data.db;
+package com.simplemvpexample.app.data.db.interfaces;
 
 import com.simplemvpexample.app.data.model.CustomCharacter;
 

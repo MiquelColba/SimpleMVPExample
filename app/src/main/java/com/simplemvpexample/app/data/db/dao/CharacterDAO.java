@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.data.db;
+package com.simplemvpexample.app.data.db.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;

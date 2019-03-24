@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.screens.character;
+package com.simplemvpexample.app.screens.character.interfaces;
 
 import com.simplemvpexample.app.data.model.CustomCharacter;
 

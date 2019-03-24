@@ -1,4 +1,4 @@
-package com.simplemvpexample.app.screens.charac_list;
+package com.simplemvpexample.app.screens.charac_list.interfaces;
 
 import android.view.View;
 

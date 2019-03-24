@@ -3,9 +3,11 @@ package com.simplemvpexample.app.screens.character;
 import android.content.Context;
 
 import com.simplemvpexample.app.data.db.CharactersDB;
-import com.simplemvpexample.app.data.db.DBHelper;
-import com.simplemvpexample.app.data.db.DBListener;
+import com.simplemvpexample.app.data.db.interfaces.DBHelper;
+import com.simplemvpexample.app.data.db.interfaces.DBListener;
 import com.simplemvpexample.app.data.model.CustomCharacter;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterInteractor;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterPresenter;
 
 import java.util.List;
 

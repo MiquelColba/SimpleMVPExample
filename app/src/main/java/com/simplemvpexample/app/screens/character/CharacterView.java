@@ -1,14 +1,9 @@
 package com.simplemvpexample.app.screens.character;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -27,12 +22,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.simplemvpexample.app.R;
-import com.simplemvpexample.app.data.db.CharactersDB;
 import com.simplemvpexample.app.data.model.CustomCharacter;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterPresenter;
+import com.simplemvpexample.app.screens.character.interfaces.I_CharacterView;
 
 public class CharacterView extends AppCompatActivity implements TextView.OnEditorActionListener, I_CharacterView {
 
