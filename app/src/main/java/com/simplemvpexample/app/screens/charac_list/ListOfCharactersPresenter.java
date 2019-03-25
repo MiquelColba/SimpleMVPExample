@@ -47,8 +47,8 @@ public class ListOfCharactersPresenter implements I_ListOfCPresenter {
     public void onCharactersAvailable(List<CustomCharacter> characters) {
         if (!characters.isEmpty()) {
             view.hideNoCharacters();
-            adapter.setCharacters( characters );
         }
+        adapter.setCharacters( characters );
     }
 
     @Override
